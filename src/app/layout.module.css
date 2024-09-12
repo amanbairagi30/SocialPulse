@@ -1,0 +1,29 @@
+@keyframes revealText {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  .animatedTitle {
+    display: inline-block;
+    overflow: hidden;
+  }
+
+  .animatedTitle span {
+    display: inline-block;
+    opacity: 0;
+    transform: translateX(-20px);
+    animation: revealLetter 0.5s forwards;
+  }
+
+  @keyframes revealLetter {
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
