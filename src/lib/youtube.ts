@@ -55,24 +55,36 @@ export async function getComments(videoId: string) {
     return cachedComments;
   }
 
-  const response = await youtube.commentThreads.list({
-    part: ['snippet'],
-    videoId,
-    maxResults: 100
-  });
-
-  const commentsToCache = response.data.items?.map(item => ({
-    id: item.id ?? '', 
-    videoId,
-    content: item.snippet?.topLevelComment?.snippet?.textDisplay ?? '',
-  })) || [];
-
-  if (commentsToCache.length > 0) {
-    await prisma.cachedComment.createMany({
-      data: commentsToCache,
-      skipDuplicates: true,
+  try {
+    const response = await youtube.commentThreads.list({
+      part: ['snippet'],
+      videoId,
+      maxResults: 100
     });
-  }
 
-  return commentsToCache; 
+    const commentsToCache = response.data.items?.map(item => ({
+      id: item.id ?? '', 
+      videoId,
+      content: item.snippet?.topLevelComment?.snippet?.textDisplay ?? '',
+    })) || [];
+
+    if (commentsToCache.length > 0) {
+      await prisma.cachedComment.createMany({
+        data: commentsToCache,
+        skipDuplicates: true,
+      });
+    }
+
+    return commentsToCache.length > 0 ? commentsToCache : null;
+  } catch (error: unknown) {
+    const youtubeError = error as YouTubeAPIError;
+    if (youtubeError.response && youtubeError.response.status === 403) {
+      return 'disabled';
+    }
+    throw error;
+  }
+}
+
+interface YouTubeAPIError extends Error {
+  response?: { status: number };
 }

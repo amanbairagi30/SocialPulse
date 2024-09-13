@@ -37,6 +37,7 @@ export default function SocialPulse() {
   const [replies, setReplies] = useState<Reply[]>([])
   const [selectedVideo, setSelectedVideo] = useState<string | null>(null)
   const [selectedTweet, setSelectedTweet] = useState<string | null>(null)
+  const [commentStatus, setCommentStatus] = useState<string | null>(null);
 
   useEffect(() => {
     console.log('Comments state updated:', comments);
@@ -68,26 +69,34 @@ export default function SocialPulse() {
   };
 
   const fetchComments = async (videoId: string) => {
-    console.log('fetchComments called with videoId:', videoId);  
+    console.log('fetchComments called with videoId:', videoId);
     try {
       const res = await fetch(`/api/youtube/comments?videoId=${videoId}`);
       if (!res.ok) {
-        throw new Error(`HTTP error! status: ${res.status}`);
-      }
-      const data = await res.json();
-      console.log('Fetched comments:', data);
-      
-      if (Array.isArray(data)) {
-        console.log('Setting comments:', data.length, 'comments found'); 
-        setComments(data);
+        if (res.status === 403) {
+          setCommentStatus("Comments are disabled for this video.");
+        } else if (res.status === 204) {
+          setCommentStatus("No comments available for this video.");
+        } else {
+          throw new Error(`HTTP error! status: ${res.status}`);
+        }
       } else {
-        console.error('Unexpected comments data structure:', data);
-        setComments([]);
+        const data = await res.json();
+        console.log('Fetched comments:', data);
+        
+        if (Array.isArray(data) && data.length > 0) {
+          setComments(data);
+          setCommentStatus(null);
+        } else {
+          setComments([]);
+          setCommentStatus("No comments available for this video.");
+        }
       }
       setSelectedVideo(videoId);
     } catch (error) {
       console.error('Error fetching comments:', error);
       setComments([]);
+      setCommentStatus("Error fetching comments. Please try again.");
     }
   };
 
@@ -155,14 +164,14 @@ export default function SocialPulse() {
                 <CardTitle>Comments for selected video</CardTitle>
               </CardHeader>
               <CardContent>
-                {comments.length > 0 ? (
-                  <ul>
-                    {comments.map((comment) => (
-                      <li key={comment.id}>{comment.content}</li>
-                    ))}
-                  </ul>
+                {commentStatus ? (
+                  <p>{commentStatus}</p>
                 ) : (
-                  <p>No comments found for this video.</p>
+                  comments.map((comment) => (
+                    <div key={comment.id}>
+                      <p>{comment.content}</p>
+                    </div>
+                  ))
                 )}
               </CardContent>
             </Card>
