@@ -45,7 +45,6 @@ export async function getVideos(channelId: string) {
 }
 
 export async function getComments(videoId: string) {
-
   const cachedComments = await prisma.cachedComment.findMany({
     where: { videoId },
     orderBy: { createdAt: 'desc' },
@@ -55,6 +54,7 @@ export async function getComments(videoId: string) {
   if (cachedComments.length > 0) {
     return cachedComments;
   }
+
   const response = await youtube.commentThreads.list({
     part: ['snippet'],
     videoId,
@@ -74,5 +74,5 @@ export async function getComments(videoId: string) {
     });
   }
 
-  return response.data.items || [];
+  return commentsToCache; 
 }
