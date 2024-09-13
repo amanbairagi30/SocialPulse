@@ -1,17 +1,23 @@
 'use client'
 
 import { useSession, signIn, signOut } from "next-auth/react"
-import { Button } from "@/components/ui/button"
+import { Button } from "./ui/button"
 
-export default function AuthButton() {
-  const { data: session } = useSession()
+export function AuthButton() {
+    const { data: session, status } = useSession()
 
-  if (session) {
-    return (
-      <Button onClick={() => signOut()}>Sign Out</Button>
-    )
-  }
-  return (
-    <Button onClick={() => signIn("google")}>Sign In with Google</Button>
-  )
+    if (status === "loading") {
+        return <div>Loading...</div>
+    }
+
+    if (status === "authenticated" && session?.user) {
+        return (
+            <>
+              
+                <Button onClick={() => signOut()}>Sign out</Button>
+            </>
+        )
+    }
+
+    return <Button onClick={() => signIn()}>Sign in</Button>
 }

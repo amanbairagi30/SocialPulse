@@ -1,6 +1,6 @@
 import { Inter } from 'next/font/google'
 import './globals.css'
-import AuthButton from '@/components/AuthButton'
+import { AuthButton } from '@/components/AuthButton'
 import { Providers } from './providers'
 import styles from './layout.module.css'
 

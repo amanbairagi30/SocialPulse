@@ -7,7 +7,7 @@ const youtube = google.youtube({
 });
 
 export async function getVideos(channelId: string) {
-  // Check cache first
+
   const cachedVideos = await prisma.cachedVideo.findMany({
     where: { channelId },
     orderBy: { createdAt: 'desc' },
@@ -18,7 +18,7 @@ export async function getVideos(channelId: string) {
     return cachedVideos;
   }
 
-  // If not in cache, fetch from API
+
   const response = await youtube.search.list({
     part: ['snippet'],
     channelId,
@@ -27,11 +27,11 @@ export async function getVideos(channelId: string) {
     maxResults: 10
   });
 
-  // Cache the results
+
   const videosToCache = response.data.items?.map(item => ({
-    id: item.id?.videoId,
+    id: item.id?.videoId ?? '',
     channelId,
-    title: item.snippet?.title,
+    title: item.snippet?.title ?? '',
   })) || [];
 
   if (videosToCache.length > 0) {
@@ -45,7 +45,7 @@ export async function getVideos(channelId: string) {
 }
 
 export async function getComments(videoId: string) {
-  // Check cache first
+
   const cachedComments = await prisma.cachedComment.findMany({
     where: { videoId },
     orderBy: { createdAt: 'desc' },
@@ -55,17 +55,14 @@ export async function getComments(videoId: string) {
   if (cachedComments.length > 0) {
     return cachedComments;
   }
-
-  // If not in cache, fetch from API
   const response = await youtube.commentThreads.list({
     part: ['snippet'],
     videoId,
     maxResults: 100
   });
 
-  // Cache the results
   const commentsToCache = response.data.items?.map(item => ({
-    id: item.id,
+    id: item.id ?? '', 
     videoId,
     content: item.snippet?.topLevelComment?.snippet?.textDisplay ?? '',
   })) || [];
