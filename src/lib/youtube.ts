@@ -44,15 +44,25 @@ export async function getVideos(channelId: string) {
   return response.data.items || [];
 }
 
-export async function getComments(videoId: string) {
+export async function getComments(videoId: string, filterWords: string[] = []) {
   const cachedComments = await prisma.cachedComment.findMany({
     where: { videoId },
     orderBy: { createdAt: 'desc' },
     take: 100,
   });
 
-  if (cachedComments.length > 0) {
-    return cachedComments;
+  let filteredComments = cachedComments;
+
+  if (filterWords.length > 0) {
+    filteredComments = cachedComments.filter(comment =>
+      filterWords.some(word => 
+        comment.content.toLowerCase().includes(word.toLowerCase())
+      )
+    );
+  }
+
+  if (filteredComments.length > 0) {
+    return filteredComments;
   }
 
   try {
@@ -62,11 +72,19 @@ export async function getComments(videoId: string) {
       maxResults: 100
     });
 
-    const commentsToCache = response.data.items?.map(item => ({
+    let commentsToCache = response.data.items?.map(item => ({
       id: item.id ?? '', 
       videoId,
       content: item.snippet?.topLevelComment?.snippet?.textDisplay ?? '',
     })) || [];
+
+    if (filterWords.length > 0) {
+      commentsToCache = commentsToCache.filter(comment =>
+        filterWords.some(word => 
+          comment.content.toLowerCase().includes(word.toLowerCase())
+        )
+      );
+    }
 
     if (commentsToCache.length > 0) {
       await prisma.cachedComment.createMany({

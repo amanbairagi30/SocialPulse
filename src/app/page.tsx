@@ -6,6 +6,9 @@ import { Button } from "@/components/ui/button"
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
+import { Label } from "@/components/ui/label"
+import { X } from 'lucide-react'
 
 
 type Video = {
@@ -42,6 +45,10 @@ export default function SocialPulse() {
   const [commentStatus, setCommentStatus] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [email, setEmail] = useState('')
+  const [filterWords, setFilterWords] = useState<string[]>([])
+  const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
+  const [newFilterWord, setNewFilterWord] = useState('');
+  const [displayedFilterWords, setDisplayedFilterWords] = useState<Array<{ word: string, dimmed: boolean }>>([]);
 
   const controls = useAnimation()
 
@@ -57,7 +64,13 @@ export default function SocialPulse() {
     }))
   }, [controls])
 
-
+  useEffect(() => {
+    const newDisplayedWords = filterWords.map(word => ({
+      word,
+      dimmed: word.startsWith('-')
+    }));
+    setDisplayedFilterWords(newDisplayedWords);
+  }, [filterWords]);
 
   const fetchVideos = async () => {
     try {
@@ -87,7 +100,8 @@ export default function SocialPulse() {
   const fetchComments = async (videoId: string) => {
     console.log('fetchComments called with videoId:', videoId);
     try {
-      const res = await fetch(`/api/youtube/comments?videoId=${videoId}`);
+      const filterParam = filterWords.length > 0 ? `&filterWords=${filterWords.join(',')}` : '';
+      const res = await fetch(`/api/youtube/comments?videoId=${videoId}${filterParam}`);
       if (!res.ok) {
         if (res.status === 403) {
           setCommentStatus("Comments are disabled for this video.");
@@ -161,6 +175,23 @@ export default function SocialPulse() {
       transition: { type: "spring", stiffness: 500, damping: 30 }
     },
     hover: { scale: 1.05, transition: { duration: 0.2 } }
+  }
+
+  const addFilterWord = () => {
+    setIsFilterModalOpen(true);
+  }
+
+  const removeFilterWord = (indexToRemove: number) => {
+    setFilterWords(filterWords.filter((_, index) => index !== indexToRemove));
+  }
+
+  const handleAddFilterWord = () => {
+    if (newFilterWord) {
+      const words = newFilterWord.split(',').map(word => word.trim()).filter(word => word !== '');
+      setFilterWords([...filterWords, ...words]);
+      setNewFilterWord('');
+      setIsFilterModalOpen(false);
+    }
   }
 
   return (
@@ -280,6 +311,30 @@ export default function SocialPulse() {
                       </CardContent>
                     </Card>
                   </motion.div>
+                )}
+                <Button onClick={addFilterWord} className="bg-green-400 hover:bg-green-500 text-purple-800 rounded-full mt-2">
+                  Add Filter Word
+                </Button>
+                {displayedFilterWords.length > 0 && (
+                  <div className="mt-2">
+                    <p>Filter words:</p>
+                    <div className="flex flex-wrap gap-2">
+                      {displayedFilterWords.map((item, index) => (
+                        <span 
+                          key={index} 
+                          className={`px-2 py-1 bg-purple-100 rounded flex items-center ${item.dimmed ? 'opacity-60' : ''}`}
+                        >
+                          {item.word}
+                          <button 
+                            onClick={() => removeFilterWord(index)} 
+                            className="ml-2 text-red-500 hover:text-red-700"
+                          >
+                            <X size={16} />
+                          </button>
+                        </span>
+                      ))}
+                    </div>
+                  </div>
                 )}
               </motion.div>
             </TabsContent>
@@ -470,6 +525,34 @@ export default function SocialPulse() {
       >
       
       </motion.div>
+
+      <Dialog open={isFilterModalOpen} onOpenChange={setIsFilterModalOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Add Filter Words</DialogTitle>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="filterWord" className="text-right">
+                Filter Words
+              </Label>
+              <Input
+                id="filterWord"
+                value={newFilterWord}
+                onChange={(e) => setNewFilterWord(e.target.value)}
+                className="col-span-3"
+                placeholder="Enter words separated by commas"
+              />
+            </div>
+            <p className="text-sm text-gray-500 col-span-4">
+              Tip: Add a comma (,) before a word to dim it. For example: great video ,bad video ,awesome
+            </p>
+          </div>
+          <DialogFooter>
+            <Button onClick={handleAddFilterWord}>Add</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

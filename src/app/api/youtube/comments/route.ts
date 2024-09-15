@@ -4,13 +4,14 @@ import { getComments } from '@/lib/youtube';
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const videoId = searchParams.get('videoId');
+  const filterWords = searchParams.get('filterWords')?.split(',') || [];
 
   if (!videoId) {
     return NextResponse.json({ error: 'Video ID is required' }, { status: 400 });
   }
 
   try {
-    const comments = await getComments(videoId);
+    const comments = await getComments(videoId, filterWords);
     if (comments === 'disabled') {
       return NextResponse.json({ message: 'Comments are disabled for this video' }, { status: 403 });
     }
