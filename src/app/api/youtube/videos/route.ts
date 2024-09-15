@@ -16,4 +16,4 @@ export async function GET(request: Request) {
     console.error('Error fetching videos:', error);
     return NextResponse.json({ error: 'Failed to fetch videos' }, { status: 500 });
   }
-}
+}  
