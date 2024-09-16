@@ -48,7 +48,6 @@ export default function SocialPulse() {
   const [filterWords, setFilterWords] = useState<string[]>([])
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
   const [newFilterWord, setNewFilterWord] = useState('');
-  const [displayedFilterWords, setDisplayedFilterWords] = useState<Array<{ word: string, dimmed: boolean }>>([]);
   const [isLoadingVideos, setIsLoadingVideos] = useState(false)
   const [isLoadingTweets, setIsLoadingTweets] = useState(false)
 
@@ -65,14 +64,6 @@ export default function SocialPulse() {
       transition: { delay: i * 0.1 }
     }))
   }, [controls])
-
-  useEffect(() => {
-    const newDisplayedWords = filterWords.map(word => ({
-      word,
-      dimmed: word.startsWith('-')
-    }));
-    setDisplayedFilterWords(newDisplayedWords);
-  }, [filterWords]);
 
   const fetchVideos = async () => {
     setIsLoadingVideos(true)
@@ -185,21 +176,16 @@ export default function SocialPulse() {
     hover: { scale: 1.05, transition: { duration: 0.2 } }
   }
 
-  const addFilterWord = () => {
-    setIsFilterModalOpen(true);
+  const handleAddFilterWord = () => {
+    if (newFilterWord.trim()) {
+      const words = newFilterWord.split(',').map(word => word.trim()).filter(word => word !== '')
+      setFilterWords(prevWords => [...prevWords, ...words])
+      setNewFilterWord('')
+    }
   }
 
   const removeFilterWord = (indexToRemove: number) => {
-    setFilterWords(filterWords.filter((_, index) => index !== indexToRemove));
-  }
-
-  const handleAddFilterWord = () => {
-    if (newFilterWord) {
-      const words = newFilterWord.split(',').map(word => word.trim()).filter(word => word !== '');
-      setFilterWords([...filterWords, ...words]);
-      setNewFilterWord('');
-      setIsFilterModalOpen(false);
-    }
+    setFilterWords(prevWords => prevWords.filter((_, index) => index !== indexToRemove))
   }
 
   return (
@@ -331,30 +317,32 @@ export default function SocialPulse() {
                     </Card>
                   </motion.div>
                 )}
-                <Button onClick={addFilterWord} className="bg-green-400 hover:bg-green-500 text-purple-800 rounded-full mt-2">
-                  Add Filter Word
-                </Button>
-                {displayedFilterWords.length > 0 && (
-                  <div className="mt-2">
-                    <p>Filter words:</p>
-                    <div className="flex flex-wrap gap-2">
-                      {displayedFilterWords.map((item, index) => (
-                        <span 
-                          key={index} 
-                          className={`px-2 py-1 bg-purple-100 rounded flex items-center ${item.dimmed ? 'opacity-60' : ''}`}
-                        >
-                          {item.word}
-                          <button 
-                            onClick={() => removeFilterWord(index)} 
-                            className="ml-2 text-red-500 hover:text-red-700"
+                <div className="mt-4">
+                  <Button onClick={() => setIsFilterModalOpen(true)} className="bg-green-400 hover:bg-green-500 text-purple-800 rounded-full">
+                    Manage Filters
+                  </Button>
+                  {filterWords.length > 0 && (
+                    <div className="mt-2">
+                      <p className="font-semibold text-purple-800">Active Filters:</p>
+                      <div className="flex flex-wrap gap-2 mt-1">
+                        {filterWords.map((word, index) => (
+                          <span 
+                            key={index} 
+                            className={`px-2 py-1 bg-purple-100 rounded-full flex items-center ${word.startsWith('-') ? 'line-through opacity-60' : ''}`}
                           >
-                            <X size={16} />
-                          </button>
-                        </span>
-                      ))}
+                            {word}
+                            <button 
+                              onClick={() => removeFilterWord(index)} 
+                              className="ml-2 text-red-500 hover:text-red-700"
+                            >
+                              <X size={16} />
+                            </button>
+                          </span>
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                )}
+                  )}
+                </div>
               </motion.div>
             </TabsContent>
             <TabsContent value="twitter">
@@ -559,31 +547,55 @@ export default function SocialPulse() {
       <Dialog open={isFilterModalOpen} onOpenChange={setIsFilterModalOpen}>
         <DialogContent className="bg-white border-4 border-purple-600 rounded-3xl shadow-[8px_8px_0px_0px_rgba(147,51,234,1)] max-w-md">
           <DialogHeader className="bg-purple-500 text-white rounded-t-2xl p-4">
-            <DialogTitle className="text-2xl font-bold">Add Filter Words</DialogTitle>
+            <DialogTitle className="text-2xl font-bold">Manage Filters</DialogTitle>
           </DialogHeader>
           <div className="p-6">
             <Label htmlFor="filterWord" className="text-purple-800 font-semibold mb-2 block">
-              Filter Words
+              Add New Filter
             </Label>
-            <Input
-              id="filterWord"
-              value={newFilterWord}
-              onChange={(e) => setNewFilterWord(e.target.value)}
-              className="w-full border-2 border-purple-400 rounded-xl mb-4"
-              placeholder="Enter words separated by commas"
-            />
-            <div className="bg-yellow-100 border-2 border-yellow-400 rounded-xl p-4 mb-6">
+            <div className="flex gap-2">
+              <Input
+                id="filterWord"
+                value={newFilterWord}
+                onChange={(e) => setNewFilterWord(e.target.value)}
+                className="w-full border-2 border-purple-400 rounded-xl  text-black placeholder-gray-400"
+                placeholder="Enter word or phrase"
+              />
+              <Button onClick={handleAddFilterWord} className="bg-green-400 hover:bg-green-500 text-purple-800 font-bold rounded-xl px-4 transition-colors duration-200">
+                Add
+              </Button>
+            </div>
+            <div className="bg-yellow-100 border-2 border-yellow-400 rounded-xl p-4 my-4">
               <h4 className="text-yellow-800 font-bold mb-2">Pro Tip:</h4>
               <p className="text-sm text-yellow-800">
-                Add a comma ( , ) before a word to exclude it. For example:
-                <br />
-                <span className="font-mono bg-yellow-200 px-1 rounded">great video , bad video, awesome</span>
+                Add a minus (-) before a word to exclude it. For example: <span className="font-mono bg-yellow-200 px-1 rounded">-bad video</span>
               </p>
             </div>
+            {filterWords.length > 0 && (
+              <div>
+                <h4 className="text-purple-800 font-semibold mb-2">Current Filters:</h4>
+                <div className="flex flex-wrap gap-2">
+                  {filterWords.map((word, index) => (
+                    <span 
+                      key={index} 
+                      className={`px-2 py-1 bg-purple-100 text-black rounded flex items-center ${word.startsWith('-') ? 'line-through opacity-60' : ''}`}
+                    >
+                      {word}
+                      <button 
+                        onClick={() => removeFilterWord(index)} 
+                        className="ml-2 text-red-500 hover:text-red-700"
+                      >
+                        <X size={16} />
+                      </button>
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
           <DialogFooter className="bg-purple-100 rounded-b-2xl p-4">
-            <Button onClick={handleAddFilterWord} className="bg-green-400 hover:bg-green-500 text-purple-800 font-bold rounded-xl px-6 py-2 transition-colors duration-200">
-              Add Filters
+            <Button onClick={() => setIsFilterModalOpen(false)} className="bg-purple-500 hover:bg-purple-600 text-white font-bold rounded-xl px-6 py-2 transition-colors duration-200">
+              Close
             </Button>
           </DialogFooter>
         </DialogContent>
