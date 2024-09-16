@@ -28,6 +28,7 @@
     "google-auth-library": "^9.14.1",
     "googleapis": "^144.0.0",
     "lucide-react": "^0.440.0",
+    "needle": "^3.3.1",
     "next": "14.2.10",
     "next-auth": "^4.24.7",
     "prisma": "^5.19.1",
@@ -39,6 +40,7 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
+    "@types/needle": "^3.3.0",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",

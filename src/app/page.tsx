@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
-import { X } from 'lucide-react'
+import { X, Loader2 } from 'lucide-react'
 
 
 type Video = {
@@ -49,6 +49,8 @@ export default function SocialPulse() {
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
   const [newFilterWord, setNewFilterWord] = useState('');
   const [displayedFilterWords, setDisplayedFilterWords] = useState<Array<{ word: string, dimmed: boolean }>>([]);
+  const [isLoadingVideos, setIsLoadingVideos] = useState(false)
+  const [isLoadingTweets, setIsLoadingTweets] = useState(false)
 
   const controls = useAnimation()
 
@@ -73,6 +75,7 @@ export default function SocialPulse() {
   }, [filterWords]);
 
   const fetchVideos = async () => {
+    setIsLoadingVideos(true)
     try {
       const res = await fetch(`/api/youtube/videos?channelId=${channelId}`);
       if (!res.ok) {
@@ -94,6 +97,8 @@ export default function SocialPulse() {
     } catch (error) {
       console.error('Error fetching videos:', error);
       setVideos([]);
+    } finally {
+      setIsLoadingVideos(false)
     }
   };
 
@@ -131,6 +136,7 @@ export default function SocialPulse() {
   };
 
   const fetchTweets = async () => {
+    setIsLoadingTweets(true)
     try {
       const res = await fetch(`/api/twitter/tweets?username=${twitterUsername}`);
       if (!res.ok) {
@@ -157,6 +163,8 @@ export default function SocialPulse() {
       console.error('Error fetching tweets:', error);
       setTweets([]);
       setError("Failed to fetch tweets. Please try again.");
+    } finally {
+      setIsLoadingTweets(false)
     }
   }
 
@@ -237,11 +245,11 @@ export default function SocialPulse() {
                 variants={comicBubble}
                 initial="hidden"
                 animate="visible"
-                whileHover="hover"
+                
                 className="grid gap-4"
               >
                 <Card className="bg-white border-4 border-purple-600 rounded-3xl shadow-[8px_8px_0px_0px_rgba(147,51,234,1)]">
-                  <CardHeader className="bg-red-400 text-white rounded-t-2xl">
+                  <CardHeader className="bg-purple-500 text-white rounded-t-2xl">
                     <CardTitle className="text-2xl">YouTube Videos</CardTitle>
                   </CardHeader>
                   <CardContent className="p-6">
@@ -252,8 +260,19 @@ export default function SocialPulse() {
                         onChange={(e) => setChannelId(e.target.value)}
                         className="border-2 border-purple-600 rounded-full"
                       />
-                      <Button onClick={fetchVideos} className="bg-yellow-400 hover:bg-yellow-500 text-purple-800 rounded-full">
-                        Fetch Videos
+                      <Button 
+                        onClick={fetchVideos} 
+                        className="bg-yellow-400 hover:bg-yellow-500 text-purple-800 rounded-full"
+                        disabled={isLoadingVideos}
+                      >
+                        {isLoadingVideos ? (
+                          <>
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            Loading...
+                          </>
+                        ) : (
+                          'Fetch Videos'
+                        )}
                       </Button>
                     </div>
                     <div className="grid gap-2">
@@ -262,7 +281,7 @@ export default function SocialPulse() {
                         return (
                           <motion.div
                             key={videoId || Math.random().toString()}
-                            whileHover={{ scale: 1.05 }}
+                           
                             whileTap={{ scale: 0.95 }}
                           >
                             <Button 
@@ -343,11 +362,11 @@ export default function SocialPulse() {
                 variants={comicBubble}
                 initial="hidden"
                 animate="visible"
-                whileHover="hover"
+              
                 className="grid gap-4"
               >
                 <Card className="bg-white border-4 border-purple-600 rounded-3xl shadow-[8px_8px_0px_0px_rgba(147,51,234,1)]">
-                  <CardHeader className="bg-blue-500 text-white rounded-t-2xl">
+                  <CardHeader className="bg-purple-500 text-white rounded-t-2xl">
                     <CardTitle className="text-2xl">Twitter Tweets</CardTitle>
                   </CardHeader>
                   <CardContent className="p-6">
@@ -359,8 +378,19 @@ export default function SocialPulse() {
                         onChange={(e) => setTwitterUsername(e.target.value)}
                         className="border-2 border-purple-600 rounded-full"
                       />
-                      <Button onClick={fetchTweets} className="bg-yellow-400 hover:bg-yellow-500 text-purple-800 rounded-full">
-                        Fetch Tweets
+                      <Button 
+                        onClick={fetchTweets} 
+                        className="bg-yellow-400 hover:bg-yellow-500 text-purple-800 rounded-full"
+                        disabled={isLoadingTweets}
+                      >
+                        {isLoadingTweets ? (
+                          <>
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            Loading...
+                          </>
+                        ) : (
+                          'Fetch Tweets'
+                        )}
                       </Button>
                     </div>
                     <div className="grid gap-2">
@@ -368,7 +398,7 @@ export default function SocialPulse() {
                         tweets.map((tweet) => (
                           <motion.div
                             key={tweet.id}
-                            whileHover={{ scale: 1.05 }}
+                          
                             whileTap={{ scale: 0.95 }}
                           >
                             <Button 
@@ -472,7 +502,7 @@ export default function SocialPulse() {
                 src={`/placeholder.svg?height=50&width=120&text=Hero ${i}`} 
                 alt={`Hero ${i}`} 
                 className="h-12 sm:h-16 filter brightness-0 invert"
-                whileHover={{ scale: 1.1, rotate: [-5, 5, -5, 5, 0] }}
+             
                 transition={{ type: "spring", stiffness: 400, damping: 10 }}
               />
             ))}
@@ -527,29 +557,34 @@ export default function SocialPulse() {
       </motion.div>
 
       <Dialog open={isFilterModalOpen} onOpenChange={setIsFilterModalOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Add Filter Words</DialogTitle>
+        <DialogContent className="bg-white border-4 border-purple-600 rounded-3xl shadow-[8px_8px_0px_0px_rgba(147,51,234,1)] max-w-md">
+          <DialogHeader className="bg-purple-500 text-white rounded-t-2xl p-4">
+            <DialogTitle className="text-2xl font-bold">Add Filter Words</DialogTitle>
           </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="filterWord" className="text-right">
-                Filter Words
-              </Label>
-              <Input
-                id="filterWord"
-                value={newFilterWord}
-                onChange={(e) => setNewFilterWord(e.target.value)}
-                className="col-span-3"
-                placeholder="Enter words separated by commas"
-              />
+          <div className="p-6">
+            <Label htmlFor="filterWord" className="text-purple-800 font-semibold mb-2 block">
+              Filter Words
+            </Label>
+            <Input
+              id="filterWord"
+              value={newFilterWord}
+              onChange={(e) => setNewFilterWord(e.target.value)}
+              className="w-full border-2 border-purple-400 rounded-xl mb-4"
+              placeholder="Enter words separated by commas"
+            />
+            <div className="bg-yellow-100 border-2 border-yellow-400 rounded-xl p-4 mb-6">
+              <h4 className="text-yellow-800 font-bold mb-2">Pro Tip:</h4>
+              <p className="text-sm text-yellow-800">
+                Add a comma ( , ) before a word to exclude it. For example:
+                <br />
+                <span className="font-mono bg-yellow-200 px-1 rounded">great video , bad video, awesome</span>
+              </p>
             </div>
-            <p className="text-sm text-gray-500 col-span-4">
-              Tip: Add a comma (,) before a word to dim it. For example: great video ,bad video ,awesome
-            </p>
           </div>
-          <DialogFooter>
-            <Button onClick={handleAddFilterWord}>Add</Button>
+          <DialogFooter className="bg-purple-100 rounded-b-2xl p-4">
+            <Button onClick={handleAddFilterWord} className="bg-green-400 hover:bg-green-500 text-purple-800 font-bold rounded-xl px-6 py-2 transition-colors duration-200">
+              Add Filters
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
