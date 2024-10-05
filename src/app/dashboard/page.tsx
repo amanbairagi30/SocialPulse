@@ -1,0 +1,51 @@
+import { Youtube, Twitter, Instagram, Facebook } from "lucide-react";
+import { PlatformCard } from "@/components/PlatformCard";
+import { getAllSocials } from "@/lib/actions";
+
+export default async function Dashboard() {
+  const platformData = await getAllSocials();
+  const youtube = platformData.find(
+    (platform) => platform.provider === "youtube"
+  );
+  const twitter = platformData.find(
+    (platform) => platform.provider === "twitter"
+  );
+  const instagram = platformData.find(
+    (platform) => platform.provider === "instagram"
+  );
+  const facebook = platformData.find(
+    (platform) => platform.provider === "facebook"
+  );
+
+  return (
+    <div className="min-h-scree py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto">
+        <h1 className="text-4xl font-bold mb-8 text-center">
+          Social Media Dashboard
+        </h1>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <PlatformCard
+            platform="YouTube"
+            icon={<Youtube className="h-6 w-6 text-red-600" />}
+            data={youtube}
+          />
+          <PlatformCard
+            platform="Twitter"
+            icon={<Twitter className="h-6 w-6 text-blue-400" />}
+            data={twitter}
+          />
+          <PlatformCard
+            platform="Instagram"
+            icon={<Instagram className="h-6 w-6 text-pink-600" />}
+            data={instagram}
+          />
+          <PlatformCard
+            platform="Facebook"
+            icon={<Facebook className="h-6 w-6 text-blue-600" />}
+            data={facebook}
+          />
+        </div>
+      </div>
+    </div>
+  );
+}

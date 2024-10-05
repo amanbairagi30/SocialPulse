@@ -1,3 +1,4 @@
+"use server";
 import { google } from 'googleapis';
 import prisma from './prisma'
 
