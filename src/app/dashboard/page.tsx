@@ -25,22 +25,22 @@ export default async function Dashboard() {
         </h1>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <PlatformCard
-            platform="YouTube"
+            platform="youtube"
             icon={<Youtube className="h-6 w-6 text-red-600" />}
             data={youtube}
           />
           <PlatformCard
-            platform="Twitter"
+            platform="twitter"
             icon={<Twitter className="h-6 w-6 text-blue-400" />}
             data={twitter}
           />
           <PlatformCard
-            platform="Instagram"
+            platform="instagram"
             icon={<Instagram className="h-6 w-6 text-pink-600" />}
             data={instagram}
           />
           <PlatformCard
-            platform="Facebook"
+            platform="facebook"
             icon={<Facebook className="h-6 w-6 text-blue-600" />}
             data={facebook}
           />

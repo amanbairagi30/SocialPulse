@@ -45,65 +45,80 @@ export async function getVideos(channelId: string) {
   return response.data.items || [];
 }
 
-export async function getComments(videoId: string, filterWords: string[] = []) {
-  const cachedComments = await prisma.cachedComment.findMany({
-    where: { videoId },
-    orderBy: { createdAt: 'desc' },
-    take: 100,
+// export async function getComments(videoId: string, filterWords: string[] = []) {
+//   const cachedComments = await prisma.cachedComment.findMany({
+//     where: { videoId },
+//     orderBy: { createdAt: 'desc' },
+//     take: 100,
+//   });
+
+//   let filteredComments = cachedComments;
+
+//   if (filterWords.length > 0) {
+//     filteredComments = cachedComments.filter(comment =>
+//       filterWords.some(word => 
+//         comment.content.toLowerCase().includes(word.toLowerCase())
+//       )
+//     );
+//   }
+
+//   if (filteredComments.length > 0) {
+//     return filteredComments;
+//   }
+
+//   try {
+//     const response = await youtube.commentThreads.list({
+//       part: ['snippet'],
+//       videoId,
+//       maxResults: 100
+//     });
+
+//     let commentsToCache = response.data.items?.map(item => ({
+//       id: item.id ?? '', 
+//       videoId,
+//       content: item.snippet?.topLevelComment?.snippet?.textDisplay ?? '',
+//     })) || [];
+
+//     if (filterWords.length > 0) {
+//       commentsToCache = commentsToCache.filter(comment =>
+//         filterWords.some(word => 
+//           comment.content.toLowerCase().includes(word.toLowerCase())
+//         )
+//       );
+//     }
+
+//     if (commentsToCache.length > 0) {
+//       await prisma.cachedComment.createMany({
+//         data: commentsToCache,
+//         skipDuplicates: true,
+//       });
+//     }
+
+//     return commentsToCache.length > 0 ? commentsToCache : null;
+//   } catch (error: unknown) {
+//     const youtubeError = error as YouTubeAPIError;
+//     if (youtubeError.response && youtubeError.response.status === 403) {
+//       return 'disabled';
+//     }
+//     throw error;
+//   }
+// }
+
+export async function getAllVideos(channelId: string) {
+  const videos = await youtube.search.list({
+    part: ["snippet"],
+    channelId,
+    maxResults: 10,
+    order: "date",
   });
-
-  let filteredComments = cachedComments;
-
-  if (filterWords.length > 0) {
-    filteredComments = cachedComments.filter(comment =>
-      filterWords.some(word => 
-        comment.content.toLowerCase().includes(word.toLowerCase())
-      )
-    );
-  }
-
-  if (filteredComments.length > 0) {
-    return filteredComments;
-  }
-
-  try {
-    const response = await youtube.commentThreads.list({
-      part: ['snippet'],
-      videoId,
-      maxResults: 100
-    });
-
-    let commentsToCache = response.data.items?.map(item => ({
-      id: item.id ?? '', 
-      videoId,
-      content: item.snippet?.topLevelComment?.snippet?.textDisplay ?? '',
-    })) || [];
-
-    if (filterWords.length > 0) {
-      commentsToCache = commentsToCache.filter(comment =>
-        filterWords.some(word => 
-          comment.content.toLowerCase().includes(word.toLowerCase())
-        )
-      );
-    }
-
-    if (commentsToCache.length > 0) {
-      await prisma.cachedComment.createMany({
-        data: commentsToCache,
-        skipDuplicates: true,
-      });
-    }
-
-    return commentsToCache.length > 0 ? commentsToCache : null;
-  } catch (error: unknown) {
-    const youtubeError = error as YouTubeAPIError;
-    if (youtubeError.response && youtubeError.response.status === 403) {
-      return 'disabled';
-    }
-    throw error;
-  }
+  return videos.data.items;
 }
 
-interface YouTubeAPIError extends Error {
-  response?: { status: number };
+export async function getComments(videoId: string) {
+  const comments = await youtube.commentThreads.list({
+    part: ["snippet"],
+    videoId,
+    maxResults: 300,
+  });
+  return comments.data.items;
 }
