@@ -15,10 +15,9 @@ import { ModeToggle } from "./ModeToggle";
 
 export default function Auth() {
   const session = useSession();
-  console.log(session);
   return (
     <div className="w-full flex justify-end p-4">
-      <div className="flex ml-auto">
+      <div className="flex space-x-4">
         <ModeToggle />
         {session.data?.user ? (
           <DropdownMenu>

@@ -5,7 +5,6 @@ import { getServerSession } from "next-auth";
 
 export async function getAllSocials() {
   const session = await getServerSession(authOptions);
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-expect-error
   const userId = session?.user?.id;
 
@@ -24,12 +23,19 @@ export async function createSocial(data: {
 }) {
   const session = await getServerSession(authOptions);
   console.error(session);
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-expect-error
   const userId = session?.user?.id;
   return await prisma.social.create({
     data: {
       ...data,
+      userId,
+    },
+  });
+}
+
+export async function getSocial(userId: string) {
+  return await prisma.social.findFirst({
+    where: {
       userId,
     },
   });
