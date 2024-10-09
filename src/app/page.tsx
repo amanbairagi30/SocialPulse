@@ -9,12 +9,17 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
 import { X, Loader2 } from 'lucide-react'
+import Hero from '@/components/Hero'
+import Auth from '@/components/Auth'
+import Features from '@/components/features'
+import Testimonials from '@/components/testimonials'
+import Footer from '@/components/footer'
 
 
 type Video = {
   id: { videoId: string };
   snippet: { title: string };
-  title?: string; 
+  title?: string;
 };
 
 type Tweet = {
@@ -73,12 +78,12 @@ export default function SocialPulse() {
         throw new Error(`HTTP error! status: ${res.status}`);
       }
       const data = await res.json();
-      console.log('API response:', data); 
-      console.log('First video object:', data[0]); 
-      
-   
+      console.log('API response:', data);
+      console.log('First video object:', data[0]);
+
+
       const videosArray = Array.isArray(data) ? data : data.items;
-      
+
       if (Array.isArray(videosArray)) {
         setVideos(videosArray);
       } else {
@@ -109,7 +114,7 @@ export default function SocialPulse() {
       } else {
         const data = await res.json();
         console.log('Fetched comments:', data);
-        
+
         if (Array.isArray(data) && data.length > 0) {
           setComments(data);
           setCommentStatus(null);
@@ -189,7 +194,24 @@ export default function SocialPulse() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-purple-100 to-white text-purple-800 font-comic-sans">
+    <>
+      <div className='absolute right-[50%] z-10 md:opacity-25 bottom-[0rem] md:-bottom-[0rem] size-[12rem] md:size-[40rem] rounded-full bg-gradient-to-t from-yellow-500/50 to-yellow-500 blur-[8em]'></div>
+
+      <section className="min-h-screen relative">
+        <div className='absolute left-[50%] z-10 translate-x-[-50%] md:opacity-25 top-[10rem] md:-top-[20rem] size-[12rem] md:size-[40rem] rounded-full bg-gradient-to-t from-primary/50 to-primary blur-[8em]'></div>
+        <div className='absolute left-[0%] z-10 translate-x-[-50%] md:opacity-25 bottom-[10rem] md:-bottom-[20rem] size-[12rem] md:size-[40rem] rounded-full bg-gradient-to-t from-primary/50 to-primary blur-[8em]'></div>
+        <div className='absolute right-[0%] z-10 md:opacity-15 bottom-[10rem] md:-bottom-[20rem] size-[12rem] md:size-[40rem] rounded-full bg-gradient-to-t from-primary/50 to-primary blur-[8em]'></div>
+        <Auth />
+        <Hero />
+      </section>
+
+      <div className="max-w-7xl px-4 mx-auto">
+        <Features />
+        <Testimonials />
+      </div>
+
+      <Footer />
+      {/* <div className="min-h-screen bg-gradient-to-b from-purple-100 to-white text-purple-800 font-comic-sans">
       <main className="container mx-auto px-4 py-8 sm:py-12">
         <motion.section 
           initial={{ y: -50, opacity: 0 }}
@@ -600,6 +622,7 @@ export default function SocialPulse() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </div>
+    </div> */}
+    </>
   )
 }

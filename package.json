@@ -32,6 +32,7 @@
     "google-auth-library": "^9.14.1",
     "googleapis": "^144.0.0",
     "lucide-react": "^0.440.0",
+    "mini-svg-data-uri": "^1.4.4",
     "needle": "^3.3.1",
     "next": "14.2.10",
     "next-auth": "^4.24.7",
