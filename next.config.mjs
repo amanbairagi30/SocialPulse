@@ -8,6 +8,7 @@ const nextConfig = {
     remotePatterns: [
       {hostname:'images.unsplash.com'},
       {hostname: 'kagi.com'},
+      {hostname: 'lh3.googleusercontent.com'},
       {hostname:'assets.aceternity.com'},
       {hostname:'i.ytimg.com'}
     ]
