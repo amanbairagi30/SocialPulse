@@ -71,7 +71,7 @@ export default function Testimonials() {
     }, [])
 
     return (
-        <div className="w-full py-12 flex flex-col items-center gap-6 bg-background text-foreground">
+        <div className="w-full py-12 mt-48 flex flex-col items-center gap-6 bg-background text-foreground">
             <div className='text-lg font-extrabold'>Testimonials</div>
             <div className="max-w-6xl mx-auto px-4 w-full">
                 <div className="text-2xl sm:text-3xl font-bold text-center mb-8">

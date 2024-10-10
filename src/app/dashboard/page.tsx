@@ -18,9 +18,9 @@ export default async function Dashboard() {
   );
 
   return (
-    <div className="min-h-scree py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-7xl mx-auto">
-        <h1 className="text-4xl font-bold mb-8 text-center">
+    <div className="min-h-scree px-4">
+      <div className="">
+        <h1 className="text-2xl font-bold mt-4 mb-8">
           Social Media Dashboard
         </h1>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">

@@ -4,7 +4,7 @@ import { Button } from './ui/button'
 
 export default function Features() {
     return (
-        <section className='flex flex-col p-4 items-center min-h-screen max-h-fit mt-24'>
+        <section className='flex flex-col p-4 items-center h-fit my-24'>
             <div className='flex flex-col text-center items-center gap-4'>
                 <div className='text-xl'>Features</div>
                 <div className='font-extrabold'>

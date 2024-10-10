@@ -15,6 +15,8 @@ const YoutubePage = async () => {
   const channelId = youtube?.username || "";
   const data = await getAllVideos(channelId);
 
+  console.log(data)
+
   return (
     <div className="p-6">
       <div className="mb-6">
