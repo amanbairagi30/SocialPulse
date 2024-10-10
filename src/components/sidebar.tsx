@@ -33,10 +33,10 @@ export default function Sidebar() {
                 className={`fixed inset-y-0 left-0 z-40 bg-background transition-all duration-300 ease-in-out
           ${sidebarVisibility ? 'translate-x-0' : '-translate-x-full'} 
           md:translate-x-0 md:relative
-          flex flex-col border-r-2 border-accent
+          flex flex-col border-accent
           ${isCollapsed ? 'md:w-20' : 'w-full sm:w-[80%] md:w-64'}`}
             >
-                <div className={`border-b-2 border-accent flex ${!isCollapsed ? "justify-between" : "justify-center"}  items-center px-4 h-16`}>
+                <div className={`dark:border-2 rounded-xl dark:border-accent shadow-md flex ${!isCollapsed ? "justify-between" : "justify-center"}  items-center px-4 h-16`}>
                     {!isCollapsed && (
                         <div>
                             <p className="text-xl font-semibold font-secondary">
@@ -52,8 +52,8 @@ export default function Sidebar() {
                     </button>
                 </div>
 
-                <div className="flex font-semibold mt-6 px-2 justify-between flex-1 flex-col">
-                    <div className="flex gap-4 h-fit flex-col">
+                <div className="flex font-semibold bg-gradient-to-b from-primary/15 rounded-xl px-3 mt-4 mb-2 justify-between flex-1 flex-col">
+                    <div className="flex gap-4 h-fit flex-col mt-4">
                         {sideBarOptions.general.map((x, idx) => (
                             <TooltipProvider key={idx}>
                                 <Tooltip>
@@ -84,22 +84,22 @@ export default function Sidebar() {
                             </TooltipProvider>
                         ))}
                     </div>
-                    {!isCollapsed && (
-                        <div className="flex items-center z-10 rounded-xl py-3 px-4 ring-1 mb-4 ring-white/10">
-                            <div className="w-[20%]">
-                                <Image
-                                    className="w-8 h-8 rounded-full"
-                                    src={user?.image ?? ''}
-                                    height={32}
-                                    width={32}
-                                    alt="user_avatar"
-                                />
-                            </div>
+                    <div className={`flex items-center z-10 rounded-xl ${isCollapsed ? "justify-center" : "py-3 px-2  ring-1 mb-4 ring-white/10"}`}>
+                        <div className={`${isCollapsed ? "w-full" : "w-[20%]"}`}>
+                            <Image
+                                className="w-8 h-8 rounded-full"
+                                src={user?.image ?? ''}
+                                height={32}
+                                width={32}
+                                alt="user_avatar"
+                            />
+                        </div>
+                        {!isCollapsed && (
                             <div className="w-[80%] font-normal text-start flex flex-col">
                                 <div className="text-xs text-gray-400">{user?.email}</div>
                             </div>
-                        </div>
-                    )}
+                        )}
+                    </div>
                 </div>
             </div>
 

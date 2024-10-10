@@ -19,7 +19,7 @@ export default function Topbar() {
 
     const pathName = usePathname();
     return (
-        <div className='border-b-2 flex px-4 items-center border-accent min-h-[4rem]'>
+        <div className='dark:border-2 dark:border-shadow shadow-md rounded-xl flex px-4 items-center border-accent min-h-[4rem]'>
             <HamburgerMenuIcon onClick={() => toggleSidebarVisibility(true)} className='mr-4 cursor-pointer block md:hidden' />
             <div className="w-full">
                 <span className="text md:text-lg relative">
