@@ -34,6 +34,8 @@ export async function createSocial(data: {
   const userId = await getUserIdFromSession();
   if (!userId) throw new Error("User not authenticated");
 
+
+
   return await prisma.social.create({
     data: {
       ...data,
@@ -52,13 +54,15 @@ export async function updateYoutubeChannelId(formData: FormData) {
   const userId = await getUserIdFromSession();
   if (!userId) throw new Error("User not authenticated");
 
+
+
   const channelId = formData.get("channelId");
   if (typeof channelId !== "string") throw new Error("Invalid channel ID");
 
   await prisma.social.upsert({
     where: {
-      userId_provider: {
-        userId,
+      userId_provider: { 
+        userId: userId,
         provider: "youtube",
       },
     },

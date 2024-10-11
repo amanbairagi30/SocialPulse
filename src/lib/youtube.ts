@@ -42,3 +42,25 @@ export async function getComments(videoId: string) {
     return [];
   }
 }
+
+export async function getChannelStats(channelId: string) {
+  try {
+    const response = await youtube.channels.list({
+      part: ['statistics'],
+      id: [channelId],
+    });
+
+    const channel = response.data.items?.[0];
+    if (!channel) {
+      throw new Error('Channel not found');
+    }
+
+    return {
+      subscribers: parseInt(channel.statistics?.subscriberCount || '0', 10),
+      videoCount: parseInt(channel.statistics?.videoCount || '0', 10),
+    };
+  } catch (error) {
+    console.error("Error fetching YouTube channel stats:", error);
+    return { subscribers: 0, videoCount: 0 };
+  }
+}
