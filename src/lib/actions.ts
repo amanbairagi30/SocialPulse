@@ -5,14 +5,14 @@ import { getServerSession } from "next-auth";
 import { revalidatePath } from "next/cache";
 import { Session } from "next-auth";
 
-
 type SessionUser = {
   id: string;
 };
 
-
 async function getUserIdFromSession(): Promise<string | null> {
-  const session = await getServerSession(authOptions) as Session & { user: SessionUser };
+  const session = (await getServerSession(authOptions)) as Session & {
+    user: SessionUser;
+  };
   return session?.user?.id || null;
 }
 
@@ -55,22 +55,22 @@ export async function updateYoutubeChannelId(formData: FormData) {
   const channelId = formData.get("channelId");
   if (typeof channelId !== "string") throw new Error("Invalid channel ID");
 
-  await prisma.social.upsert({
-    where: {
-      userId_provider: {
-        userId,
-        provider: "youtube",
-      },
-    },
-    update: { username: channelId },
-    create: {
-      userId,
-      provider: "youtube",
-      username: channelId,
-      followers: 0,
-      posts: 0,
-    },
-  });
+  // await prisma.social.upsert({
+  //   where: {
+  //     userId_provider: {
+  //       userId,
+  //       provider: "youtube",
+  //     },
+  //   },
+  //   update: { username: channelId },
+  //   create: {
+  //     userId,
+  //     provider: "youtube",
+  //     username: channelId,
+  //     followers: 0,
+  //     posts: 0,
+  //   },
+  // });
 
   revalidatePath("/dashboard/youtube");
 }
