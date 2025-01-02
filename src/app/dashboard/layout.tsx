@@ -17,7 +17,7 @@ const Layout = async (props: Props) => {
     }
 
     return (
-        <div className="flex !h-screen w-screen">
+        <div className="flex gap-4 pt-4 px-2 !h-screen w-screen">
             {/* <Sidebar /> */}
             <Sidebar />
             <AuxiliaryProvider>

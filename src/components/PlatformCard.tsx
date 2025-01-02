@@ -4,11 +4,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Users, FileText } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Social } from "@prisma/client";
 import { createSocial } from "@/lib/actions";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { getChannelStats } from "@/lib/youtube";
 
 export const PlatformCard = ({
   platform,
@@ -21,7 +22,23 @@ export const PlatformCard = ({
 }) => {
   const [username, setUsername] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [channelStats, setChannelStats] = useState({ subscribers: 0, videoCount: 0 });
   const router = useRouter();
+
+  useEffect(() => {
+    if (data?.username && platform.toLowerCase() === "youtube") {
+      fetchChannelStats(data.username);
+    }
+  }, [data, platform]);
+
+  const fetchChannelStats = async (channelId: string) => {
+    try {
+      const stats = await getChannelStats(channelId);
+      setChannelStats(stats);
+    } catch (error) {
+      console.error("Error fetching channel stats:", error);
+    }
+  };
 
   function handleSubmit() {
     async function addAccount() {
@@ -52,12 +69,18 @@ export const PlatformCard = ({
               <div className="flex items-center space-x-2 ">
                 <Users className="h-4 w-4" />
                 <span className="text-2xl font-bold">
-                  {data.followers.toLocaleString()}
+                  {platform.toLowerCase() === "youtube"
+                    ? channelStats.subscribers.toLocaleString()
+                    : data.followers.toLocaleString()}
                 </span>
               </div>
               <div className="flex items-center space-x-2 ">
                 <FileText className="h-4 w-4" />
-                <span>{data.posts.toLocaleString()} posts</span>
+                <span>
+                  {platform.toLowerCase() === "youtube"
+                    ? `${channelStats.videoCount.toLocaleString()} videos`
+                    : `${data.posts.toLocaleString()} posts`}
+                </span>
               </div>
             </div>
           </CardContent>

@@ -1,6 +1,6 @@
 # SocialPulse
 
-SocialPulse is a web application that allows you to filter and analyze content for creators. It is built with Next.js, MongoDB, and Tailwind CSS.
+SocialPulse is a web application that allows you to filter and custom good looking ai  thumbnails analyze content for creators. It is built with Next.js,
 
 ## Features
 
